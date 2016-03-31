@@ -4,5 +4,6 @@
 # ROMS
 *.bin
 
-# Dependences and libraries
+# Dependences and libraries except alewrap files
 torch/**
+!torch/share/lua/5.1/alewrap/*
