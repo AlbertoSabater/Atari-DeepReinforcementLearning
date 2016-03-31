@@ -4,6 +4,8 @@
 # ROMS
 *.bin
 
+*~
+
 # Dependences and libraries except alewrap files
 torch/*
 !torch/share
