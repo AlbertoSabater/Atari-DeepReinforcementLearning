@@ -6,4 +6,11 @@
 
 # Dependences and libraries except alewrap files
 torch/*
-!torch/share/lua/5.1/alewrap/
+!torch/share
+torch/share/*
+!torch/share/lua
+torch/share/lua/*
+!torch/share/lua/5.1
+torch/share/lua/5.1/*
+!torch/share/lua/5.1/alewrap
+
