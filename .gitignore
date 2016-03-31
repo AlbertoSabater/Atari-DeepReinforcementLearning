@@ -1,0 +1,8 @@
+# Trained networks
+*.t7
+
+# ROMS
+*.bin
+
+# Dependences and libraries
+torch/**
