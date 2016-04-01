@@ -78,6 +78,8 @@ local nrewards
 local nepisodes
 local episode_reward
 
+local date = os.date("%m%d")
+
 local screen, reward, terminal = game_env:getState()
 
 print("Iteration ..", step)
@@ -191,10 +193,10 @@ while step < opt.steps do
 
         local filename = opt.name
         if opt.save_versions > 0 then
-            filename = filename .. "_" .. math.floor(step / opt.save_versions)
+            filename = "/tmp/trained_networks/" .. filename .. "_" .. math.floor(step / opt.save_versions) .. "_" .. date
         end
         filename = filename
-        torch.save(filename .. ".t7", {agent = agent,
+        torch.save("/tmp/trained_networks/" .. filename .. "_" .. date .. ".t7", {agent = agent,
                                 model = agent.network,
                                 best_model = agent.best_network,
                                 reward_history = reward_history,
@@ -207,7 +209,7 @@ while step < opt.steps do
                                 arguments=opt})
         if opt.saveNetworkParams then
             local nets = {network=w:clone():float()}
-            torch.save(filename..'.params.t7', nets, 'ascii')
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.params.t7', nets, 'ascii')
         end
         agent.valid_s, agent.valid_a, agent.valid_r, agent.valid_s2,
             agent.valid_term = s, a, r, s2, term

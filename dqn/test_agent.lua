@@ -80,6 +80,8 @@ local episode_reward
 
 local screen, reward, terminal = game_env:newGame()
 
+print("TESTING")
+
 total_reward = 0
 nrewards = 0
 nepisodes = 0
