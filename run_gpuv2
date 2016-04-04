@@ -42,9 +42,9 @@ agent_params="lr="$lr",ep=1,ep_end="$eps_end",ep_endt="$eps_endt",discount="$dis
 steps=50000000			# number of training steps to perform
 eval_freq=250000		# frequency of greedy evaluation
 eval_steps=125000		# number of evaluation steps
-prog_freq=5000			# saves the agent network in a separate file
+prog_freq=10000			# saves the agent network in a separate file
 save_freq=125000		# the model is saved every save_freq steps
-gpu=-1				# gpu flag
+gpu=0				# gpu flag
 random_starts=30		# play action 0 between 1 and random starts number of times at the start of each training episode
 pool_frms="type="$pool_frms_type",size="$pool_frms_size		# string of frame pooling parameters
 num_threads=4

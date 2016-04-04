@@ -13,7 +13,7 @@ n_replay=1
 if [ $# -eq 2 ]; then	 # Default, use trained network
 	netfile="\"convnet_atari3\""
 else 
-	netfile="\"DQN3_0_1_"$1"_FULL_Y.t7\"" 
+	netfile="\"/tmp/trained_networks/DQN3_0_1_"$1"_FULL_Y_0401.t7\"" 
 fi
 update_freq=4
 actrep=4

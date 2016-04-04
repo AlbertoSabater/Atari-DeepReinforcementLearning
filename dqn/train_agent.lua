@@ -103,7 +103,7 @@ while step < opt.steps do
     if step % opt.prog_freq == 0 then
         assert(step==agent.numSteps, 'trainer step: ' .. step ..
                 ' & agent.numSteps: ' .. agent.numSteps)
-        print("Steps: ", step)
+        print("Steps: ", step, "\t", os.date("%x %X"))
         agent:report()
         collectgarbage()
     end
@@ -210,6 +210,10 @@ while step < opt.steps do
         if opt.saveNetworkParams then
             local nets = {network=w:clone():float()}
             torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.params.t7', nets, 'ascii')
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsNetwork.t7', model, 'ascii')
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsBestNetwork.t7', best_model, 'ascii')
+            lightModel = model:clone('weight','bias','running_mean','running_std')
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsLightModel.t7', lightModel, 'ascii')
         end
         agent.valid_s, agent.valid_a, agent.valid_r, agent.valid_s2,
             agent.valid_term = s, a, r, s2, term
