@@ -73,7 +73,7 @@ function nql:__init(args)
 
     local msg, err = pcall(require, self.network)
     if not msg then
-        print("Loading trained network")
+        print("Loading trained network", self.network)
         -- try to load saved agent
         local err_msg, exp = pcall(torch.load, self.network)
         if not err_msg then
