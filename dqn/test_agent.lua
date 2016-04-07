@@ -80,12 +80,46 @@ local episode_reward
 
 local screen, reward, terminal = game_env:newGame()
 
-print("TESTING")
-
 total_reward = 0
 nrewards = 0
 nepisodes = 0
 episode_reward = 0
+
+-- Fill stored data from the last  training
+local msg, err = pcall(require, opt.agent_params.network)
+if not msg then
+    print("Loading training parameters", opt.agent_params.network)
+    -- try to load saved agent
+    local err_msg, exp = pcall(torch.load, opt.agent_params.network)
+    if not err_msg then
+        error("Could not find network file ")
+    end
+    if exp.reward_history then
+      reward_history = exp.reward_history
+    end
+    if exp.reward_counts then
+      reward_counts = exp.reward_counts
+    end
+    if exp.episode_counts then
+      episode_counts = exp.episode_counts
+    end
+    if exp.time_history then
+      time_history = exp.time_history
+    end
+    if exp.v_history then
+      v_history = exp.v_history
+    end
+    if exp.td_history then
+      td_history = exp.td_history
+    end
+    if exp.qmax_history then
+      qmax_history = exp.qmax_history
+    end
+end
+
+
+
+print("TESTING")
 
 local eval_time = sys.clock()
 for estep=1,opt.eval_steps do
@@ -108,6 +142,7 @@ for estep=1,opt.eval_steps do
         nepisodes = nepisodes + 1
         screen, reward, terminal = game_env:nextRandomGame()
     end
+    
 end
 
 eval_time = sys.clock() - eval_time

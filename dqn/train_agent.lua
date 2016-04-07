@@ -82,6 +82,40 @@ local date = os.date("%m%d")
 
 local screen, reward, terminal = game_env:getState()
 
+
+-- Fill stored data from the last  training
+local msg, err = pcall(require, opt.agent_params.network)
+if not msg then
+    print("Loading training parameters", opt.agent_params.network)
+    -- try to load saved agent
+    local err_msg, exp = pcall(torch.load, opt.agent_params.network)
+    if not err_msg then
+        error("Could not find network file ")
+    end
+    if exp.reward_history then
+      reward_history = exp.reward_history
+    end
+    if exp.reward_counts then
+      reward_counts = exp.reward_counts
+    end
+    if exp.episode_counts then
+      episode_counts = exp.episode_counts
+    end
+    if exp.time_history then
+      time_history = exp.time_history
+    end
+    if exp.v_history then
+      v_history = exp.v_history
+    end
+    if exp.td_history then
+      td_history = exp.td_history
+    end
+    if exp.qmax_history then
+      qmax_history = exp.qmax_history
+    end
+end
+
+
 print("Iteration ..", step)
 while step < opt.steps do
     step = step + 1
@@ -113,7 +147,7 @@ while step < opt.steps do
     -- Evaluate the system each opt.eval_freq steps
     -- Create a new game and iterate opt.eval_steps 
     if step % opt.eval_freq == 0 and step > learn_start then
-
+print("- Evaluating")
         screen, reward, terminal = game_env:newGame()
 
         total_reward = 0
@@ -182,6 +216,7 @@ while step < opt.steps do
 
     -- Store the current network each opt.save_freq or when the training has ended
     if step % opt.save_freq == 0 or step == opt.steps then
+print("- Saving")
         local s, a, r, s2, term = agent.valid_s, agent.valid_a, agent.valid_r,
             agent.valid_s2, agent.valid_term
         agent.valid_s, agent.valid_a, agent.valid_r, agent.valid_s2,
@@ -209,11 +244,11 @@ while step < opt.steps do
                                 arguments=opt})
         if opt.saveNetworkParams then
             local nets = {network=w:clone():float()}
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.params.t7', nets, 'ascii')
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsNetwork.t7', model, 'ascii')
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsBestNetwork.t7', best_model, 'ascii')
-            lightModel = model:clone('weight','bias','running_mean','running_std')
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsLightModel.t7', lightModel, 'ascii')
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.params.t7', { nets = nets })
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsNetwork.t7', { model = model })
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsBestNetwork.t7', { best = best_model })
+            lightModel = agent.network:clone('weight','bias','running_mean','running_std')
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsLightModel.t7', { model = lightModel })
         end
         agent.valid_s, agent.valid_a, agent.valid_r, agent.valid_s2,
             agent.valid_term = s, a, r, s2, term
