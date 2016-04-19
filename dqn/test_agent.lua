@@ -45,6 +45,7 @@ cmd:option('-verbose', 2,
 cmd:option('-threads', 1, 'number of BLAS threads')
 cmd:option('-gpu', -1, 'gpu flag')
 cmd:option('-display', 0, '1 to enable display')
+cmd:option('-save_frames', 0, '1 to store game frames')
 
 cmd:text()
 
@@ -53,7 +54,13 @@ local opt = cmd:parse(arg)
 
 --- General setup.
 local game_env, game_actions, agent, opt = setup(opt)
-
+print("ACCIONES", game_actions)
+-- print the lines
+    for i,line in ipairs(game_actions) do
+      print(i, line)
+    end
+    
+    
 -- override print to always flush the output
 local old_print = print
 local print = function(...)
@@ -78,7 +85,7 @@ local nrewards
 local nepisodes
 local episode_reward
 
-local screen, reward, terminal = game_env:newGame()
+local date = os.date("%m%d")
 
 total_reward = 0
 nrewards = 0
@@ -121,6 +128,8 @@ end
 
 print("TESTING")
 
+local screen, reward, terminal = game_env:newGame()
+
 local eval_time = sys.clock()
 for estep=1,opt.eval_steps do
     local action_index = agent:perceive(reward, screen, terminal, true, 0.05)
@@ -137,6 +146,16 @@ for estep=1,opt.eval_steps do
     end
 
     if terminal then
+        if opt.save_frames == 1 then    -- store  frames and exit
+            merge=nn.Sequential()
+                    :add(nn.JoinTable(1))
+                    :add(nn.View(-1, 4, 84, 84))
+            output = merge:forward(agent.stored_frames)
+            torch.save( "../stored_frames/frames_" .. opt.env .. "_" .. date .. ".t7", { frames = output })
+            print ("Frames saved")
+            --do return end
+            os.exit()
+        end
         total_reward = total_reward + episode_reward
         episode_reward = 0
         nepisodes = nepisodes + 1

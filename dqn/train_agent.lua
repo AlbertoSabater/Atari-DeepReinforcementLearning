@@ -82,7 +82,6 @@ local date = os.date("%m%d")
 
 local screen, reward, terminal = game_env:getState()
 
-
 -- Fill stored data from the last  training
 local msg, err = pcall(require, opt.agent_params.network)
 if not msg then
@@ -245,10 +244,12 @@ print("- Saving")
         if opt.saveNetworkParams then
             local nets = {network=w:clone():float()}
             torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.params.t7', { nets = nets })
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsNetwork.t7', { model = model })
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsBestNetwork.t7', { best = best_model })
             lightModel = agent.network:clone('weight','bias','running_mean','running_std')
             torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsLightModel.t7', { model = lightModel })
+            --[[
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsNetwork.t7', { model = model })
+            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsBestNetwork.t7', { best = best_model })
+            ]]
         end
         agent.valid_s, agent.valid_a, agent.valid_r, agent.valid_s2,
             agent.valid_term = s, a, r, s2, term

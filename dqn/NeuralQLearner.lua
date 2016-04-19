@@ -10,6 +10,8 @@ end
 
 local nql = torch.class('dqn.NeuralQLearner')
 
+local win = nil
+local numImage = 0
 
 function nql:__init(args)
     self.state_dim  = args.state_dim -- State dimensionality.
@@ -59,9 +61,16 @@ function nql:__init(args)
     self.histSpacing    = args.histSpacing or 1
     self.nonTermProb    = args.nonTermProb or 1
     self.bufferSize     = args.bufferSize or 512
+    
+    self.save_frames    = args.save_frames or 0
+    
+    if self.save_frames == 1 then
+      self.stored_frames = {}
+    end
 
     self.transition_params = args.transition_params or {}
 
+    self.name_network 	= args.network
     self.network    = args.network or self:createNetwork()
 
     -- check whether there is a network file
@@ -86,8 +95,26 @@ function nql:__init(args)
         end
     else
         print('Creating Agent Network from ' .. self.network)
+        self.load_weights = args.load_weights
+        self.weights_src = args.weights_src
+
         self.network = err
-        self.network = self:network()
+        self.network, net_args = self:network()
+    
+	--[[
+        if args.load_weights == 1 then
+            print ("AAAAA", args.weights_src, net_args)
+            local K = torch.load(args.weights_src,'binary')
+            --print(K.kernels:size())
+            --print(self.network:get(2).weight:size())
+            --print (net_args.n_units[1], net_args.filter_size[1], net_args.filter_stride[1])
+            --local kw = K.kernels:resize(net_args.n_units[1],net_args.filter_stride[1],net_args.filter_size[1],net_args.filter_size[1])
+            --self.network:get(2).weight = kw
+
+        else
+            print("BBBBBB")
+        end
+	]]
     end
 
     if self.gpu and self.gpu >= 0 then
@@ -299,10 +326,13 @@ end
 
 
 function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
+    
+  --win = image.display({image=rawstate, win=win})
     -- Preprocess state (will be set to nil if terminal)
     local state = self:preprocess(rawstate):float()
     local curState
-
+  --win = image.display({image=state:resize(84,84), win=win})
+   
     if self.max_reward then
         reward = math.min(reward, self.max_reward)
     end
@@ -313,10 +343,11 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
         self.r_max = math.max(self.r_max, reward)
     end
 
+    -- Add current screen to recent_state
     self.transitions:add_recent_state(state, terminal)
 
     local currentFullState = self.transitions:get_recent()
-
+  
     --Store transition s, a, r, s'
     if self.lastState and not testing then
         self.transitions:add(self.lastState, self.lastAction, reward,
@@ -326,10 +357,32 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     if self.numSteps == self.learn_start+1 and not testing then
         self:sample_validation_data()
     end
+    
 
     curState= self.transitions:get_recent()
     curState = curState:resize(1, unpack(self.input_dims))
 
+    
+    if self.save_frames == 1 and numImage >= 3 then             -- Store the current frame
+        --print (curState[1]:size())
+        table.insert(self.stored_frames, curState[1])
+        numImage = numImage + 1
+    end
+
+
+  --image.save("../images/mspacman" .. numImage .. ".pgm",state[1]) 
+  numImage = numImage + 1
+--  img = curState:clone()
+--  print (img:size())
+--  win = image.display({image=img[1]:resize(168,168), win=win})
+--  print (img:size())
+
+    -- display screen
+    --win = image.display({image=curState:resize(84,84), win=win})
+  --win = image.display({image=curState[1], win=win})
+    --os.execute("sleep " .. tonumber(2))
+  --os.execute("sleep 0.1")
+ 
     -- Select action
     local actionIndex = 1
     if not terminal then
@@ -380,6 +433,13 @@ end
 
 
 function nql:greedy(state)
+--  img = state:clone()
+--  img = img:resize(168,168)
+--  img = img:resize(1,4,84,84)
+--  win = image.display({image=img[1], win=win})
+--  print(state:size())
+--  image.save("../images/mspacman" .. numImage .. ".pgm",img) 
+--  numImage = numImage + 1
     -- Turn single state into minibatch.  Needed for convolutional nets.
     if state:dim() == 2 then
         assert(false, 'Input must be at least 3D')
