@@ -298,6 +298,7 @@ function trans:add(s, a, r, term)
 end
 
 
+-- Add a new frame to recent_state and remove the first one
 function trans:add_recent_state(s, term)
     local s = s:clone():float():mul(255):byte()
     if #self.recent_s == 0 then
