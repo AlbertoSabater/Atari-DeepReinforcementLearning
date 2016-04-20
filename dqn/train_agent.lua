@@ -45,6 +45,7 @@ cmd:option('-verbose', 2,
 cmd:option('-threads', 1, 'number of BLAS threads')
 cmd:option('-gpu', -1, 'gpu flag')
 cmd:option('-display', 0, '1 to enable display')
+cmd:option('-store_src', "", 'Path to store the trained network')
 
 cmd:text()
 
@@ -113,6 +114,8 @@ if not msg then
       qmax_history = exp.qmax_history
     end
 end
+
+print (opt.store_src)
 
 
 print("Iteration ..", step)
@@ -227,10 +230,10 @@ print("- Saving")
 
         local filename = opt.name
         if opt.save_versions > 0 then
-            filename = "/tmp/trained_networks/" .. filename .. "_" .. math.floor(step / opt.save_versions) .. "_" .. date
+            filename = opt.store_src .. filename .. "_" .. math.floor(step / opt.save_versions) .. "_" .. date
         end
         filename = filename
-        torch.save("/tmp/trained_networks/" .. filename .. "_" .. date .. ".t7", {agent = agent,
+        torch.save(opt.store_src .. filename .. "_" .. date .. ".t7", {agent = agent,
                                 model = agent.network,
                                 best_model = agent.best_network,
                                 reward_history = reward_history,
@@ -243,9 +246,9 @@ print("- Saving")
                                 arguments=opt})
         if opt.saveNetworkParams then
             local nets = {network=w:clone():float()}
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.params.t7', { nets = nets })
+            torch.save(opt.store_src .. filename .. "_" .. date ..'.params.t7', { nets = nets })
             lightModel = agent.network:clone('weight','bias','running_mean','running_std')
-            torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsLightModel.t7', { model = lightModel })
+            torch.save(opt.store_src .. filename .. "_" .. date ..'.paramsLightModel.t7', { model = lightModel })
             --[[
             torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsNetwork.t7', { model = model })
             torch.save("/tmp/trained_networks/" .. filename .. "_" .. date ..'.paramsBestNetwork.t7', { best = best_model })
