@@ -32,7 +32,7 @@ n_replay=1
 if [ $new_net == true ]; then	 # Default, use trained network
 	netfile="\"convnet_atari3\""
 else 
-	netfile="\"/tmp/trained_networks/DQN3_0_1_"$1"_FULL_Y_0419.paramsLightModel.t7\"" 
+	netfile="\"../trained_networks_old/ms_pacman/DQN3_0_1_"$1"_FULL_Y_0422.paramsLightModel.t7\"" 
 fi
 update_freq=4
 actrep=4
@@ -67,7 +67,7 @@ args="-framework $FRAMEWORK -game_path $game_path -name $agent_name -env $ENV -e
 #echo $args
 
 cd dqn
-if [ display ]; then 
+if [ $display == 1 ]; then 
 	../torch/bin/qlua test_agent.lua $args;
 else
 	../torch/bin/luajit test_agent.lua $args;

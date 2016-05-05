@@ -61,9 +61,9 @@ function nql:__init(args)
     self.histSpacing    = args.histSpacing or 1
     self.nonTermProb    = args.nonTermProb or 1
     self.bufferSize     = args.bufferSize or 512
-    
+
     self.save_frames    = args.save_frames or 0
-    
+
     if self.save_frames == 1 then
       self.stored_frames = {}
     end
@@ -97,10 +97,12 @@ function nql:__init(args)
         print('Creating Agent Network from ' .. self.network)
         self.load_weights = args.load_weights
         self.weights_src = args.weights_src
+        self.load_net_kernels = args.load_net_kernels
+        self.trained_kernels_net = args.trained_kernels_net;
 
         self.network = err
         self.network, net_args = self:network()
-    
+
 	--[[
         if args.load_weights == 1 then
             print ("AAAAA", args.weights_src, net_args)
@@ -326,13 +328,13 @@ end
 
 
 function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
-    
+
   --win = image.display({image=rawstate, win=win})
     -- Preprocess state (will be set to nil if terminal)
     local state = self:preprocess(rawstate):float()
     local curState
   --win = image.display({image=state:resize(84,84), win=win})
-   
+
     if self.max_reward then
         reward = math.min(reward, self.max_reward)
     end
@@ -347,7 +349,7 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     self.transitions:add_recent_state(state, terminal)
 
     local currentFullState = self.transitions:get_recent()
-  
+
     --Store transition s, a, r, s'
     if self.lastState and not testing then
         self.transitions:add(self.lastState, self.lastAction, reward,
@@ -357,12 +359,12 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     if self.numSteps == self.learn_start+1 and not testing then
         self:sample_validation_data()
     end
-    
+
 
     curState= self.transitions:get_recent()
     curState = curState:resize(1, unpack(self.input_dims))
 
-    
+
     if self.save_frames == 1 and numImage >= 3 then             -- Store the current frame
         --print (curState[1]:size())
         table.insert(self.stored_frames, curState[1])
@@ -370,7 +372,7 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     end
 
 
-  --image.save("../images/mspacman" .. numImage .. ".pgm",state[1]) 
+  --image.save("../images/mspacman" .. numImage .. ".pgm",state[1])
   numImage = numImage + 1
 --  img = curState:clone()
 --  print (img:size())
@@ -382,7 +384,7 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
   --win = image.display({image=curState[1], win=win})
     --os.execute("sleep " .. tonumber(2))
   --os.execute("sleep 0.1")
- 
+
     -- Select action
     local actionIndex = 1
     if not terminal then
@@ -438,7 +440,7 @@ function nql:greedy(state)
 --  img = img:resize(1,4,84,84)
 --  win = image.display({image=img[1], win=win})
 --  print(state:size())
---  image.save("../images/mspacman" .. numImage .. ".pgm",img) 
+--  image.save("../images/mspacman" .. numImage .. ".pgm",img)
 --  numImage = numImage + 1
     -- Turn single state into minibatch.  Needed for convolutional nets.
     if state:dim() == 2 then

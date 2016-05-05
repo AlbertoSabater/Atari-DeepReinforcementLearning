@@ -11,6 +11,7 @@ FRAMEWORK="alewrap"		# name of training framework
 save_frames=0
 new_net=false
 load_weights=0
+load_net_kernels=0
 weights_src="__"
 netfile="\"convnet_paper1\""
 for i in "$@" ; do
@@ -25,6 +26,9 @@ echo $i
     if [[ $i == "-ln" ]] ; then		# load trained network
 	netfile="\"/tmp/trained_networks/DQN3_0_1_"$1"_FULL_Y_0407.t7\""
     fi
+    if [[ $i == "-lnk" ]] ; then		# load network with trained kernels
+	load_net_kernels=1
+    fi
 done
 #echo $save_frames $new_net $load_weights
 
@@ -36,7 +40,8 @@ update_freq=4
 actrep=4			# how many times to repeat action
 discount=0.99
 seed=1				# fixed input seed for repeteable experiments
-learn_start=50000
+#learn_start=50000
+learn_start=5000
 pool_frms_type="\"max\""
 pool_frms_size=2
 initial_priority="false"
@@ -49,7 +54,11 @@ preproc_net="\"net_downsample_2x_full_y\""
 agent_name=$agent_type"_"$1"_FULL_Y"	# filename used for saving network
 state_dim=7056
 ncols=1
-agent_params="lr="$lr",ep=1,ep_end="$eps_end",ep_endt="$eps_endt",discount="$discount",hist_len=4,learn_start="$learn_start",replay_memory="$replay_memory",update_freq="$update_freq",n_replay="$n_replay",network="$netfile",preproc="$preproc_net",state_dim="$state_dim",minibatch_size=32,rescale_r=1,ncols="$ncols",bufferSize=512,valid_size=500,target_q=10000,clip_delta=1,min_reward=-1,max_reward=1,save_frames="$save_frames",load_weights="$load_weights",weights_src="$weights_src		# string of the agent parameters
+
+trained_kernels_net="\"../stored_kernels/kernels_net_ms_pacman_0505.t7\""
+#trained_kernels_net="\"\""
+
+agent_params="lr="$lr",trained_kernels_net="$trained_kernels_net",load_net_kernels="$load_net_kernels",ep=1,ep_end="$eps_end",ep_endt="$eps_endt",discount="$discount",hist_len=4,learn_start="$learn_start",replay_memory="$replay_memory",update_freq="$update_freq",n_replay="$n_replay",network="$netfile",preproc="$preproc_net",state_dim="$state_dim",minibatch_size=32,rescale_r=1,ncols="$ncols",bufferSize=512,valid_size=500,target_q=10000,clip_delta=1,min_reward=-1,max_reward=1,save_frames="$save_frames",load_weights="$load_weights",weights_src="$weights_src		# string of the agent parameters
 steps=50000000			# number of training steps to perform
 eval_freq=250000		# frequency of greedy evaluation
 eval_steps=125000		# number of evaluation steps
@@ -68,10 +77,13 @@ args="-framework $FRAMEWORK -game_path $game_path -name $agent_name -env $ENV -e
 echo $agent_params
 
 mkdir "/tmp/trained_networks"
+#path="../trained_networks/"$1"_log_"$md
+path="/tmp/trained_networks/"$1"_log_"$md
+echo $path
 cd dqn
 if [ display ]; then 
-	../torch/bin/qlua train_agent.lua $args 2>&1 | tee "/tmp/trained_networks/"$1"_log_"$md;
+	../torch/bin/qlua train_agent.lua $args 2>&1 | tee $path;
 else
-	../torch/bin/luajit train_agent.lua $args 2>&1 | tee "/tmp/trained_networks/"$1"_log_"$md;
+	../torch/bin/luajit train_agent.lua $args 2>&1 | tee $path;
 fi
 
