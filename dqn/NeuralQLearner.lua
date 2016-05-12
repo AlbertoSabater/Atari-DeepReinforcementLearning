@@ -72,6 +72,8 @@ function nql:__init(args)
 
     self.name_network 	= args.network
     self.network    = args.network or self:createNetwork()
+    self.gpu_type    = args.gpu_type
+
 
     -- check whether there is a network file
     local network_function
@@ -120,7 +122,11 @@ function nql:__init(args)
     end
 
     if self.gpu and self.gpu >= 0 then
-        self.network:cuda()
+        if self.gpu_type == 1 then
+            self.network:cuda()
+        else
+            self.network:cl()
+        end
     else
         self.network:float()
     end
@@ -138,8 +144,13 @@ function nql:__init(args)
     self.preproc:float()
 
     if self.gpu and self.gpu >= 0 then
-        self.network:cuda()
-        self.tensor_type = torch.CudaTensor
+        if self.gpu_type == 1 then
+            self.network:cuda()
+            self.tensor_type = torch.CudaTensor
+        else
+            self.network:cl()
+            self.tensor_type = torch.ClTensor
+        end
     else
         self.network:float()
         self.tensor_type = torch.FloatTensor
@@ -155,7 +166,7 @@ function nql:__init(args)
         histLen = self.hist_len, gpu = self.gpu,
         maxSize = self.replay_memory, histType = self.histType,
         histSpacing = self.histSpacing, nonTermProb = self.nonTermProb,
-        bufferSize = self.bufferSize
+        bufferSize = self.bufferSize, gpu_type = self.gpu_type
     }
 
     self.transitions = dqn.TransitionTable(transition_args)
@@ -261,7 +272,13 @@ function nql:getQUpdate(args)
         targets[i][a[i]] = delta[i]
     end
 
-    if self.gpu >= 0 then targets = targets:cuda() end
+    if self.gpu >= 0 then
+        if self.gpu_type == 1 then
+            targets = targets:cuda()
+        else
+            targets = targets:cl()
+        end
+    end
 
     return targets, delta, q2_max
 end
@@ -449,7 +466,11 @@ function nql:greedy(state)
     end
 
     if self.gpu >= 0 then
-        state = state:cuda()
+        if self.gpu_type == 1 then
+            state = state:cuda()
+        else
+            state = state:cl()
+        end
     end
 
     local q = self.network:forward(state):float():squeeze()
@@ -492,7 +513,11 @@ end
 function nql:_loadNet()
     local net = self.network
     if self.gpu then
-        net:cuda()
+        if self.gpu_type == 1 then
+            net:cuda()
+        else
+            net:cl()
+        end
     else
         net:float()
     end

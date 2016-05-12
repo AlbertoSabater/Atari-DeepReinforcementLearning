@@ -37,8 +37,8 @@ local gameScreen = torch.class('alewrap.GameScreen')
 
 
 -- Create a game screen with an empty frame buffer.
-function gameScreen:__init(_params, _gpu)
-    self:reset(_params, _gpu)
+function gameScreen:__init(_params, _gpu, _gpu_type)
+    self:reset(_params, _gpu, _type)
 end
 
 
@@ -69,7 +69,7 @@ Calling `reset` incurs a one-off cost for reallocating storage. If new input
 frames will have the same dimension and the same type of CPU/GPU operations
 will be used, then it is faster to call `clear` instead of `reset`.
 ]]
-function gameScreen:reset(_params, _gpu)
+function gameScreen:reset(_params, _gpu, _gpu_type)
     self.frameBuffer= nil
     self.poolBuffer = nil
     self.lastIndex  = 0
@@ -106,7 +106,7 @@ end
 
 
 -- Adds a frame at the top of the buffer.
-function gameScreen:paint(frame)
+function gameScreen:paint(frame, gpu_type)
     assert(frame)
     if not self.frameBuffer then
         --- set up frame buffer
@@ -115,7 +115,11 @@ function gameScreen:paint(frame)
         -- using static tensor storage instead of a
         -- queue for performance reasons (~10x faster on GPUs)
         if self.gpu and self.gpu >= 0 then
-            self.frameBuffer = torch.CudaTensor(dims)
+            if gpu_type == 1 then
+	            self.frameBuffer = torch.CudaTensor(dims)
+            else
+	            self.frameBuffer = torch.ClTensor(dims)
+            end
         else
             self.frameBuffer = torch.FloatTensor(dims)
         end

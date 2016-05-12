@@ -5,6 +5,15 @@ See LICENSE file for full terms of limited license.
 ]]
 dqn = {}
 
+
+--package.path = './?.lua;/home/asabater/Atari-DeepReinforcementLearning/torch/share/luajit-2.0.4/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;/home/asabater/Atari-DeepReinforcementLearning/torch/share/lua/5.1/?.lua;/home/asabater/Atari-DeepReinforcementLearning/torch/share/lua/5.1/?/init.lua;' .. package.path
+
+--package.cpath = './?.so;/usr/local/lib/lua/5.1/?.so;/home/asabater/Atari-DeepReinforcementLearning/torch/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;' .. package.cpath
+
+
+--package.path = package.path .. ';./?.lua;/usr/local/torch-cl/share/luajit-2.0.4/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/torch-cl/share/lua/5.1/?.lua;/usr/local/torch-cl/share/lua/5.1/?/init.lua;'
+--package.cpath = package.cpath .. ';./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/torch-cl/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so;'
+
 require 'torch'
 require 'nn'
 require 'nngraph'
@@ -14,6 +23,7 @@ require 'Scale'
 require 'NeuralQLearner'
 require 'TransitionTable'
 require 'Rectifier'
+
 
 
 function torchSetup(_opt)
@@ -55,14 +65,31 @@ function torchSetup(_opt)
 
     --- set gpu device
     if opt.gpu and opt.gpu >= 0 then
-        require 'cutorch'
-        require 'cunn'
+        if opt.gpu_type == 1 then
+            require 'cutorch'
+            require 'cunn'
+        else
+          require 'clnn'
+          require 'cltorch'
+        end
+
         if opt.gpu == 0 then
             local gpu_id = tonumber(os.getenv('GPU_ID'))
             if gpu_id then opt.gpu = gpu_id+1 end
         end
-        if opt.gpu > 0 then cutorch.setDevice(opt.gpu) end
-        opt.gpu = cutorch.getDevice()
+        if opt.gpu > 0 then
+        	if opt.gpu_type == 1 then
+			cutorch.setDevice(opt.gpu)
+		else
+			cltorch.setDevice(opt.gpu)
+		end
+	end
+	if opt.gpu_type == 1 then
+		cutorch.getDevice(opt.gpu)
+	else
+		cltorch.getDevice(opt.gpu)
+	end
+
         print('Using GPU device id:', opt.gpu-1)
     else
         opt.gpu = -1
@@ -85,9 +112,15 @@ function torchSetup(_opt)
     end
     local firstRandInt = torch.random()
     if opt.gpu >= 0 then
-        cutorch.manualSeed(firstRandInt)
+	if opt.gpu_type == 1 then
+		cutorch.manualSeed(firstRandInt)
+	else
+		--cltorch.manualSeed(firstRandInt)
+	end
+
+       -- cutorch.manualSeed(firstRandInt)
         if opt.verbose >= 1 then
-            print('CUTorch Seed:', cutorch.initialSeed())
+            --print('CUTorch Seed:', cutorch.initialSeed())
         end
     end
 
@@ -124,7 +157,7 @@ function setup(_opt)
     _opt.agent_params.actions   = gameActions
     _opt.agent_params.gpu       = _opt.gpu
     _opt.agent_params.best      = _opt.best
-    
+
     if _opt.network ~= '' then
         _opt.agent_params.network = _opt.network
     end

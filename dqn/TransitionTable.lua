@@ -23,6 +23,7 @@ function trans:__init(args)
     self.gpu = args.gpu
     self.numEntries = 0
     self.insertIndex = 0
+    self.gpu_type = args.gpu_type
 
     self.histIndices = {}
     local histLen = self.histLen
@@ -71,8 +72,13 @@ function trans:__init(args)
     self.buf_s2     = torch.ByteTensor(self.bufferSize, s_size):fill(0)
 
     if self.gpu and self.gpu >= 0 then
-        self.gpu_s  = self.buf_s:float():cuda()
-        self.gpu_s2 = self.buf_s2:float():cuda()
+        if self.gpu_type == 1 then
+            self.gpu_s  = self.buf_s:float():cuda()
+            self.gpu_s2 = self.buf_s2:float():cuda()
+        else
+            self.gpu_s  = self.buf_s:float():cl()
+            self.gpu_s2 = self.buf_s2:float():cl()
+        end
     end
 end
 
@@ -396,7 +402,12 @@ function trans:read(file)
     self.buf_s2     = torch.ByteTensor(self.bufferSize, self.stateDim * self.histLen):fill(0)
 
     if self.gpu and self.gpu >= 0 then
-        self.gpu_s  = self.buf_s:float():cuda()
-        self.gpu_s2 = self.buf_s2:float():cuda()
+        if self.gpu_type == 1 then
+            self.gpu_s  = self.buf_s:float():cuda()
+            self.gpu_s2 = self.buf_s2:float():cuda()
+        else
+            self.gpu_s  = self.buf_s:float():cl()
+            self.gpu_s2 = self.buf_s2:float():cl()
+        end
     end
 end

@@ -18,7 +18,7 @@ function create_network(args)
 
         net:insert(nn.Reshape(unpack(args.input_dims)), 1)
     else
-
+print (unpack(args.input_dims))
         net:add(nn.Reshape(unpack(args.input_dims)))
 
         if args.load_net_kernels == 1 and args.trained_kernels_net ~= nil and args.trained_kernels_net ~= "" then
@@ -96,9 +96,14 @@ function create_network(args)
 
     local nel
     if args.gpu >= 0 then
-        -- net:add(nn.Transpose({4,3},{3,2},{2,1})) -> deprecated with CUDA
-        nel = net:cuda():forward(torch.zeros(1,unpack(args.input_dims))
-                :cuda()):nElement()
+        if args.gpu_type == 1 then
+            -- net:add(nn.Transpose({4,3},{3,2},{2,1})) -> deprecated with CUDA
+            nel = net:cuda():forward(torch.zeros(1,unpack(args.input_dims))
+                    :cuda()):nElement()
+        else
+          nel = net:cl():forward(torch.zeros(1,unpack(args.input_dims))
+                  :cl()):nElement()
+        end
     else
         nel = net:forward(torch.zeros(1,unpack(args.input_dims))):nElement()
     end
@@ -127,7 +132,11 @@ end
 
 
     if args.gpu >=0 then
-        net:cuda()
+        if args.gpu_type == 1 then
+            net:cuda()
+        else
+            net:cl()
+        end
     end
     if args.verbose >= 2 then
         print(net)

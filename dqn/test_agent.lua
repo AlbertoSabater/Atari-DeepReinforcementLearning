@@ -46,6 +46,7 @@ cmd:option('-threads', 1, 'number of BLAS threads')
 cmd:option('-gpu', -1, 'gpu flag')
 cmd:option('-display', 0, '1 to enable display')
 cmd:option('-save_frames', 0, '1 to store game frames')
+cmd:option('-gpu_type', 1, '1->nvidia | 2->amd')
 
 cmd:text()
 
@@ -59,8 +60,8 @@ print("ACCIONES", game_actions)
     for i,line in ipairs(game_actions) do
       print(i, line)
     end
-    
-    
+
+
 -- override print to always flush the output
 local old_print = print
 local print = function(...)
@@ -93,6 +94,7 @@ nepisodes = 0
 episode_reward = 0
 
 -- Fill stored data from the last  training
+--[[
 local msg, err = pcall(require, opt.agent_params.network)
 if not msg then
     print("Loading training parameters", opt.agent_params.network)
@@ -123,7 +125,7 @@ if not msg then
       qmax_history = exp.qmax_history
     end
 end
-
+]]
 
 
 print("TESTING")
@@ -161,7 +163,7 @@ for estep=1,opt.eval_steps do
         nepisodes = nepisodes + 1
         screen, reward, terminal = game_env:nextRandomGame()
     end
-    
+
 end
 
 eval_time = sys.clock() - eval_time
@@ -198,4 +200,3 @@ print(string.format(
     step, step*opt.actrep, total_reward, agent.ep, agent.lr, time_dif,
     training_rate, eval_time, opt.actrep*opt.eval_steps/eval_time,
     nepisodes, nrewards))
-

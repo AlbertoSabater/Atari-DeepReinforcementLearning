@@ -28,6 +28,7 @@ function gameEnv:__init(_opt)
     self.verbose        = _opt.verbose or 0
     self._actrep        = _opt.actrep or 1
     self._random_starts = _opt.random_starts or 1
+    self.gpu_type      = _opt.gpu_type
     self._screen        = alewrap.GameScreen(_opt.pool_frms, _opt.gpu)
     self:reset(_opt.env, _opt.env_params, _opt.gpu, _opt.display)
     return self
@@ -88,7 +89,7 @@ end
 function gameEnv:_step(action)
     assert(action)
     local x = self.game:play(action)
-    self._screen:paint(x.data)
+    self._screen:paint(x.data, self.gpu_type)
     return x.data, x.reward, x.terminal, x.lives
 end
 
