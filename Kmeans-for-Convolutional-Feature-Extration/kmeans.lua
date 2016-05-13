@@ -86,8 +86,8 @@ function unsup.kmeans_modified(x, k, centroids, std, niter, batchsize, callback,
       totalcounts:add(counts)
 
       -- callback?
-      if callback then 
-         local ret = callback(i,centroids:reshape(k_size),totalcounts) 
+      if callback then
+         local ret = callback(i,centroids:reshape(k_size),totalcounts)
          if ret then break end
       end
    end

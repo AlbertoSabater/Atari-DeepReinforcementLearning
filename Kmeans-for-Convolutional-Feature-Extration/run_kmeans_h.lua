@@ -26,17 +26,15 @@ local date = os.date("%m%d")
 
 
 local game = "ms_pacman"
-local network = "convnet_paper1"
+local network = "convnet_paper1_bigger"
 
 local msg, err = pcall(require, network)
 network= err
 
-args = str_to_table('lr=0.00025,ep=1,ep_end=0.1,ep_endt=replay_memory,discount=0.99,hist_len=4,learn_start=50000,replay_memory=1000000,update_freq=4,n_replay=1,network="convnet_paper1",preproc="net_downsample_2x_full_y",state_dim=7056,minibatch_size=32,rescale_r=1,ncols=1,bufferSize=512,valid_size=500,target_q=10000,clip_delta=1,min_reward=-1,max_reward=1,save_frames=0,only_conv=1')
-args.input_dims = {args.hist_len*args.ncols, 84, 84}
-args.gpu = -1
-args.verbose = 0
-
-network, args = network(args)
+args = {}
+args.hist_len = 4
+args.ncols = 1
+args = network(args)
 
 
 local data = torch.load("../stored_frames/frames_" .. game .. "_0419.t7",'binary')
@@ -49,7 +47,7 @@ local trsize = fr:size(1)
 local numPatches = 50000
 local featureRelation = 2
 
-local numLayers = 1
+local numLayers = 5
 
 
 local net = nn.Sequential()
