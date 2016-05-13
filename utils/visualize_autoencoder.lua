@@ -12,7 +12,7 @@ require 'initenv'
 require 'image'
 
 params = {
-    src_net = "../trained_networks/autoencoders/ms_pacman_0512.t7",
+    src_net = "../trained_networks/autoencoders/ms_pacman_encoder_0513.t7",
     src_data = "../stored_frames/frames_ms_pacman_0419.t7"
 }
 
@@ -22,9 +22,21 @@ print (net)
 data = torch.load(params.src_data).frames:double()
 
 
-numImage = 100
+numImage = 700
 res = net:forward(data[numImage])
 print (res:size())
 
+
+original = image.toDisplayTensor{input=image.scale(data[numImage],res:size(2)*3, res:size(2)*3),
+                                 padding=5,
+                                 nrow = 2 }
+
+reconstruction = image.toDisplayTensor{input=image.scale(res,res:size(2)*3, res:size(2)*3),
+                                    padding=5,
+                                    nrow = 2 }
+
 image.display(data[numImage])
 image.display(res)
+
+image.display{image=original, legend="Original"}
+image.display{image=reconstruction, legend="Reconstruction"}
