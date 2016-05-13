@@ -4,7 +4,7 @@ Copyright (c) 2014 Google Inc.
 See LICENSE file for full terms of limited license.
 ]]
 
-require "initenv"
+--require "initenv"
 
 function create_network(args)
 
@@ -18,7 +18,6 @@ function create_network(args)
 
         net:insert(nn.Reshape(unpack(args.input_dims)), 1)
     else
-print (unpack(args.input_dims))
         net:add(nn.Reshape(unpack(args.input_dims)))
 
         if args.load_net_kernels == 1 and args.trained_kernels_net ~= nil and args.trained_kernels_net ~= "" then

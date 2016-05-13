@@ -9,6 +9,7 @@ if not dqn then
 end
 
 local nql = torch.class('dqn.NeuralQLearner')
+require 'convnet'
 
 local win = nil
 local numImage = 0
@@ -103,8 +104,9 @@ function nql:__init(args)
         self.trained_kernels_net = args.trained_kernels_net;
 
         self.network = err
-        self.network, net_args = self:network()
-
+--        self.network, net_args = self:network()
+        args = self:network(args)
+        self.network = create_network(args)
 	--[[
         if args.load_weights == 1 then
             print ("AAAAA", args.weights_src, net_args)

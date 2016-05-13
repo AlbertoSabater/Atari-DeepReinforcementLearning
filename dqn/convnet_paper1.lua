@@ -4,8 +4,7 @@ Copyright (c) 2014 Google Inc.
 See LICENSE file for full terms of limited license.
 ]]
 
-
-require 'convnet'
+require 'Rectifier'
 
 return function(args)
 
@@ -15,6 +14,5 @@ return function(args)
     args.n_hid          = {256}
     args.nl             = nn.Rectifier
 
-    return create_network(args), args
+    return args
 end
-
