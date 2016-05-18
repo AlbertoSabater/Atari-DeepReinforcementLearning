@@ -10,9 +10,11 @@ require 'nnutils'
 require 'cutorch'
 require 'initenv'
 require 'image'
+require 'unsup'
+
 
 params = {
-    src_net = "../trained_networks/autoencoders/ms_pacman_encoder_0513.t7",
+    src_net = "../stored_kernels/autoencoders/ms_pacman_encoder_diag_0518.t7",
     src_data = "../stored_frames/frames_ms_pacman_0419.t7"
 }
 
@@ -22,7 +24,11 @@ print (net)
 data = torch.load(params.src_data).frames:double()
 
 
-numImage = 700
+if arg[1] == nil then
+    numImage = 100
+else
+    numImage = arg[1]
+end
 res = net:forward(data[numImage])
 print (res:size())
 
