@@ -224,16 +224,19 @@ print("- Evaluating", "\t", os.date("%x %X"))
     if step % opt.save_freq == 0 or step == opt.steps then
 print("- Saving", "\t", os.date("%x %X"))
 
-      local filename = opt.name
+        local filename = opt.name
 
-      if opt.saveNetworkParams then
+        if opt.saveNetworkParams then
             --[[
             local nets = {network=w:clone():float()}
             torch.save(opt.store_src .. filename .. "_" .. date ..'.params.t7', { nets = nets })
             lightModel = agent.network:clone('weight','bias','running_mean','running_std')
             torch.save(opt.store_src .. filename .. "_" .. date ..'.paramsLightModel.t7', { model = lightModel })
             ]]
-            torch.save(opt.store_src .. filename .. "_" .. date ..'.model.t7', { model = agent.network })
+
+            -- Save the comlete network and also only the convolutional part
+            torch.save(opt.store_src .. filename .. "_" .. date ..'.model.t7', { model = agent.network, network = agent.network:get(2) })
+            print('Saved:', opt.store_src .. filename .. "_" .. date ..'.model.t7', "\t", os.date("%x %X"))
         else
             local s, a, r, s2, term = agent.valid_s, agent.valid_a, agent.valid_r,
                 agent.valid_s2, agent.valid_term
@@ -266,10 +269,9 @@ print("- Saving", "\t", os.date("%x %X"))
                 agent.valid_term = s, a, r, s2, term
             agent.w, agent.dw, agent.g, agent.g2, agent.delta, agent.delta2,
                 agent.deltas, agent.tmp = w, dw, g, g2, delta, delta2, deltas, tmp
+            print('Saved:', filename .. '.t7', "\t", os.date("%x %X"))
         end
 
-
-        print('Saved:', filename .. '.t7', "\t", os.date("%x %X"))
         io.flush()
         collectgarbage()
     end

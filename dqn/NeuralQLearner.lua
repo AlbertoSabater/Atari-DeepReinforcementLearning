@@ -101,6 +101,7 @@ function nql:__init(args)
         self.load_weights = args.load_weights
         self.weights_src = args.weights_src
         self.load_net_kernels = args.load_net_kernels
+        self.freeze_kernels = args.freeze_kernels
         self.trained_kernels_net = args.trained_kernels_net;
 
         self.network = err

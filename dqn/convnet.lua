@@ -11,12 +11,15 @@ function create_network(args)
     local net = nn.Sequential()
     local convLayer = nn.SpatialConvolution
 
+    local convLayers = nn.Sequential()
+
     if args.load_weights == 1 then              -- Load convolutional network with trained features
         print ("Loading convolutional network with trained features")
         local K = torch.load(args.weights_src,'binary')
-        net = K.network
+        convLayers = K.network
 
         net:insert(nn.Reshape(unpack(args.input_dims)), 1)
+        net:add(convLayers)
     else
         net:add(nn.Reshape(unpack(args.input_dims)))
 
@@ -26,72 +29,92 @@ function create_network(args)
 
             local K = torch.load(args.trained_kernels_net,'binary')
             net1 = K.network
+            --[[
+            if net1 == nil then
+                net1 = K.model
+            end
+            ]]
+
+print (net1)
+print ("AAAAAAAAAAAAAAAAAAAAAAAAA", net1:size())
 
             -- Freezing net1
-            net1.accGradParameters = function() end
-            net1.updateParameters = function() end
+            if args.freeze_kernels == 1 then
+print ("Freezing kernels")
+                net1.accGradParameters = function() end
+                net1.updateParameters = function() end
+            end
 
-          --==============================================================================
-          -- CREATE MAIN NETWORK WITHOUT THE net1 NUMBER FEATURES
-
+      --==============================================================================
+      -- CREATE MAIN NETWORK WITHOUT THE net1 NUMBER FEATURES
             net2 = nn.Sequential()
-            net2:add(convLayer(args.hist_len*args.ncols, args.n_units[1] - net1:get(1).nOutputPlane,
-                                args.filter_size[1], args.filter_size[1],
-                                args.filter_stride[1], args.filter_stride[1],1))
-            net2:add(args.nl())
+
+            if args.n_units[1] - net1:get(1).nOutputPlane > 0 then
+                net2:add(convLayer(args.hist_len*args.ncols, args.n_units[1] - net1:get(1).nOutputPlane,
+                                    args.filter_size[1], args.filter_size[1],
+                                    args.filter_stride[1], args.filter_stride[1],1))
+                net2:add(args.nl())
+            end
 
             local index
             for i=1,(#args.n_units-1) do
-
                 if (i+1)*2 <= net1:size() then    -- THIS LAYER EXIST IN trained_network
                     -- second convolutional layer
-                    net2:add(convLayer(net2:get(i*2-1).nOutputPlane, args.n_units[i+1]  - net1:get((i+1)*2-1).nOutputPlane,
-                                        args.filter_size[i+1], args.filter_size[i+1],
-                                        args.filter_stride[i+1], args.filter_stride[i+1]))
-                    net2:add(args.nl())
+                    if args.n_units[i+1] - net1:get((i+1)*2-1).nOutputPlane > 0 then
+                        net2:add(convLayer(net2:get(i*2-1).nOutputPlane, args.n_units[i+1] - net1:get((i+1)*2-1).nOutputPlane,
+                                            args.filter_size[i+1], args.filter_size[i+1],
+                                            args.filter_stride[i+1], args.filter_stride[i+1]))
+                        net2:add(args.nl())
+                    end
                 else
                   index = i
                 end
-
             end
-            --==============================================================================
+      --==============================================================================
 
-            parallel_model = nn.Concat(2)  -- model that concatenates net1 and net2
-            parallel_model:add(net1)
-            parallel_model:add(net2)
 
-            net:add(parallel_model)
+            if net2:size() > 0 then
+                parallel_model = nn.Concat(2)  -- model that concatenates net1 and net2
+                parallel_model:add(net1)
+                parallel_model:add(net2)
+                convLayers:add(parallel_model)
+            else
+                convLayers:add(net1)
+            end
 
-            if index then                 -- ADD REMAINING LAYERS
+      --==============================================================================
+      -- ADD REMAINING LAYERS
+
+            if index then
                 for i=index,(#args.n_units-1) do
-                  net:add(convLayer(args.n_units[i], args.n_units[i+1],
+                  convLayers:add(convLayer(args.n_units[i], args.n_units[i+1],
                                       args.filter_size[i+1], args.filter_size[i+1],
                                       args.filter_stride[i+1], args.filter_stride[i+1]))
-                  net:add(args.nl())
+                  convLayers:add(args.nl())
                 end
             end
+      --==============================================================================
 
-        else
-            net = nn.Sequential()
-            net:add(nn.Reshape(unpack(args.input_dims)))
-            net:add(convLayer(args.hist_len*args.ncols, args.n_units[1],
+        else       -- CREATION OF A NEW EMPTY NETWORK
+            --net = nn.Sequential()
+            --net:add(nn.Reshape(unpack(args.input_dims)))
+            convLayers:add(convLayer(args.hist_len*args.ncols, args.n_units[1],
                                 args.filter_size[1], args.filter_size[1],
                                 args.filter_stride[1], args.filter_stride[1],1))
-            net:add(args.nl())
+            convLayers:add(args.nl())
 
             -- Add convolutional layers
             for i=1,(#args.n_units-1) do
                 -- second convolutional layer
-                net:add(convLayer(args.n_units[i], args.n_units[i+1],
+                convLayers:add(convLayer(args.n_units[i], args.n_units[i+1],
                                     args.filter_size[i+1], args.filter_size[i+1],
                                     args.filter_stride[i+1], args.filter_stride[i+1]))
-                net:add(args.nl())
+                convLayers:add(args.nl())
             end
-
         end
 
+        net:add(convLayers)
     end
-
 
     local nel
     if args.gpu >= 0 then
