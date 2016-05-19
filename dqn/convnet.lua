@@ -25,18 +25,20 @@ function create_network(args)
 
         if args.load_net_kernels == 1 and args.trained_kernels_net ~= nil and args.trained_kernels_net ~= "" then
 
-          --==============================================================================
-
+      --==============================================================================
+      -- LOAD SPECIFIED NUMBER OF LAYERS TRAINED NETWORK
             local K = torch.load(args.trained_kernels_net,'binary')
-            net1 = K.network
-            --[[
-            if net1 == nil then
-                net1 = K.model
-            end
-            ]]
+            local aux = K.network
+            local net1 = nn.Sequential()
 
-print (net1)
-print ("AAAAAAAAAAAAAAAAAAAAAAAAA", net1:size())
+print ("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", aux:size())
+            if args.num_layers == -1 or args.num_layers*2 >=   aux:size() then
+                net1 = aux:clone()
+            else
+                for i=1,args.num_layers*2 do   -- Load the specified number or layers with their ReLU's
+                    net1:add(aux:get(i))
+                end
+            end
 
             -- Freezing net1
             if args.freeze_kernels == 1 then
