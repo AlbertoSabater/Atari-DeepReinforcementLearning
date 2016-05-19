@@ -8,6 +8,7 @@ See LICENSE file for full terms of limited license.
 
 function create_network(args)
 
+    local full_model = nil
     local net = nn.Sequential()
     local convLayer = nn.SpatialConvolution
 
@@ -15,7 +16,7 @@ function create_network(args)
 
     if args.load_weights == 1 then              -- Load convolutional network with trained features
         print ("Loading convolutional network with trained features")
-        local K = torch.load(args.weights_src,'binary')
+        full_model = torch.load(args.weights_src,'binary')
         convLayers = K.network
 
         net:insert(nn.Reshape(unpack(args.input_dims)), 1)
@@ -27,12 +28,13 @@ function create_network(args)
 
       --==============================================================================
       -- LOAD SPECIFIED NUMBER OF LAYERS TRAINED NETWORK
-            local K = torch.load(args.trained_kernels_net,'binary')
-            local aux = K.network
+            full_model = torch.load(args.trained_kernels_net,'binary')
+            local aux = full_model.network
             local net1 = nn.Sequential()
 
 print ("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", aux:size())
-            if args.num_layers == -1 or args.num_layers*2 >=   aux:size() then
+print ("Num fc", args.load_num_fc)
+            if args.num_layers <= 0 or args.num_layers*2 >=   aux:size() then
                 net1 = aux:clone()
             else
                 for i=1,args.num_layers*2 do   -- Load the specified number or layers with their ReLU's
@@ -81,7 +83,9 @@ print ("Freezing kernels")
                 parallel_model:add(net2)
                 convLayers:add(parallel_model)
             else
-                convLayers:add(net1)
+                for i=1,net1:size() do        -- Avoid another sequential or parallel model
+                    convLayers:add(net1:get(i))
+                end
             end
 
       --==============================================================================
@@ -132,26 +136,65 @@ print ("Freezing kernels")
         nel = net:forward(torch.zeros(1,unpack(args.input_dims))):nElement()
     end
 
-if args.only_conv ~= 1 then
+if args.only_conv ~= 1 then     -- Add fully connected layers
 
     -- reshape all feature planes into a vector per example
     local netFC = nn.Sequential()
-    netFC:add(nn.Reshape(nel))
 
-    -- fully connected layer
-    netFC:add(nn.Linear(nel, args.n_hid[1]))
-    netFC:add(args.nl())
-    local last_layer_size = args.n_hid[1]
+    if args.load_num_fc > 0 then    -- Load the specified number of fc layers and create new ones if is necessary
+print ("Loading Fully Connected Layers", args.load_num_fc)
 
-    for i=1,(#args.n_hid-1) do
-        -- add Linear layer
-        last_layer_size = args.n_hid[i+1]
-        netFC:add(nn.Linear(args.n_hid[i], last_layer_size))
+        local old_fc = full_model.model:get(3)
+        local last_layer_size = args.n_hid[1]
+
+        local index_fc = 0
+        for i=1,old_fc:size() do      -- Add the specified number of fc layers
+            netFC:add(old_fc:get(i))
+
+            if old_fc:get(i).weight ~= nil then   -- Trainable layer (linear fc)
+                index_fc = index_fc + 1
+                if index_fc == args.load_num_fc then    -- End loading
+                    last_layer_size = netFC:get(netFC:size()).weight:size(1)
+                    if old_fc:size() < (i+1) and old_fc:get(i+1) ~= nil and old_fc:get(i+1).weight == nil then   -- if mext layer is not trainnable -> add
+                        netFC:add(old_fc:get(i+1))
+                    end
+                    break
+                end
+            end
+        end   -- end for
+
+        for i=(index_fc),(#args.n_hid-1) do
+            -- add empty Linear layer
+            last_layer_size = args.n_hid[i+1]
+            netFC:add(nn.Linear(args.n_hid[i], last_layer_size))
+            netFC:add(args.nl())
+        end
+
+
+        -- add the last fully connected layer (to actions) if is not added yet
+        if netFC:get(netFC:size()).weight:size(1) ~= args.n_actions then
+            netFC:add(nn.Linear(last_layer_size, args.n_actions))
+        end
+
+    else      -- Add empty linear layers according to the specification
+        netFC:add(nn.Reshape(nel))
+
+        -- fully connected layer
+        netFC:add(nn.Linear(nel, args.n_hid[1]))
         netFC:add(args.nl())
+        local last_layer_size = args.n_hid[1]
+
+        for i=1,(#args.n_hid-1) do
+            -- add Linear layer
+            last_layer_size = args.n_hid[i+1]
+            netFC:add(nn.Linear(args.n_hid[i], last_layer_size))
+            netFC:add(args.nl())
+        end
+
+        -- add the last fully connected layer (to actions)
+        netFC:add(nn.Linear(last_layer_size, args.n_actions))
     end
 
-    -- add the last fully connected layer (to actions)
-    netFC:add(nn.Linear(last_layer_size, args.n_actions))
 
     net:add(netFC)
 

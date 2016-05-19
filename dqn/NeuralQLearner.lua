@@ -103,6 +103,7 @@ function nql:__init(args)
         self.load_net_kernels = args.load_net_kernels
         self.freeze_kernels = args.freeze_kernels
         self.num_layers = args.num_layers
+        self.load_num_fc = args.load_num_fc
         self.trained_kernels_net = args.trained_kernels_net;
 
         self.network = err
