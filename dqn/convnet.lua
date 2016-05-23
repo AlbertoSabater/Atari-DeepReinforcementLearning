@@ -25,15 +25,15 @@ function create_network(args)
         net:add(nn.Reshape(unpack(args.input_dims)))
 
         if args.load_net_kernels == 1 and args.trained_kernels_net ~= nil and args.trained_kernels_net ~= "" then
+print ("Loading trained filters")
 
       --==============================================================================
-      -- LOAD SPECIFIED NUMBER OF LAYERS TRAINED NETWORK
+      -- LOAD SPECIFIED NUMBER OF LAYERS FROM TRAINED NETWORK
             full_model = torch.load(args.trained_kernels_net,'binary')
             local aux = full_model.network
             local net1 = nn.Sequential()
 
-print ("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", aux:size())
-print ("Num fc", args.load_num_fc)
+print ("Num convolutional (x2):", args.num_layers)
             if args.num_layers <= 0 or args.num_layers*2 >=   aux:size() then
                 net1 = aux:clone()
             else
@@ -45,12 +45,17 @@ print ("Num fc", args.load_num_fc)
             -- Freezing net1
             if args.freeze_kernels == 1 then
 print ("Freezing kernels")
-                net1.accGradParameters = function() end
-                net1.updateParameters = function() end
+
+                for i, m in ipairs(net1.modules) do
+                   if torch.type(m):find('Convolution') then
+                      m.accGradParameters = function() end
+                      m.updateParameters = function() end
+                   end
+                end
             end
 
       --==============================================================================
-      -- CREATE MAIN NETWORK WITHOUT THE net1 NUMBER FEATURES
+      -- CREATE MAIN NETWORK WITHOUT THE net1 NUMBER OF FEATURES
             net2 = nn.Sequential()
 
             if args.n_units[1] - net1:get(1).nOutputPlane > 0 then
@@ -102,6 +107,7 @@ print ("Freezing kernels")
       --==============================================================================
 
         else       -- CREATION OF A NEW EMPTY NETWORK
+print ("New empty network")
             --net = nn.Sequential()
             --net:add(nn.Reshape(unpack(args.input_dims)))
             convLayers:add(convLayer(args.hist_len*args.ncols, args.n_units[1],
@@ -142,7 +148,7 @@ if args.only_conv ~= 1 then     -- Add fully connected layers
     local netFC = nn.Sequential()
 
     if args.load_num_fc > 0 then    -- Load the specified number of fc layers and create new ones if is necessary
-print ("Loading Fully Connected Layers", args.load_num_fc)
+print ("Loading Fully Connected Layers (x2)", args.load_num_fc)
 
         local old_fc = full_model.model:get(3)
         local last_layer_size = args.n_hid[1]
@@ -155,7 +161,7 @@ print ("Loading Fully Connected Layers", args.load_num_fc)
                 index_fc = index_fc + 1
                 if index_fc == args.load_num_fc then    -- End loading
                     last_layer_size = netFC:get(netFC:size()).weight:size(1)
-                    if old_fc:size() < (i+1) and old_fc:get(i+1) ~= nil and old_fc:get(i+1).weight == nil then   -- if mext layer is not trainnable -> add
+                    if old_fc:size() >= (i+1) and old_fc:get(i+1) ~= nil and old_fc:get(i+1).weight == nil then   -- if mext layer is not trainnable -> add
                         netFC:add(old_fc:get(i+1))
                     end
                     break
@@ -172,7 +178,7 @@ print ("Loading Fully Connected Layers", args.load_num_fc)
 
 
         -- add the last fully connected layer (to actions) if is not added yet
-        if netFC:get(netFC:size()).weight:size(1) ~= args.n_actions then
+        if netFC:get(netFC:size()).weight == nil then
             netFC:add(nn.Linear(last_layer_size, args.n_actions))
         end
 
