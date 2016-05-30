@@ -143,7 +143,7 @@ while step < opt.steps do
     if step % opt.prog_freq == 0 then
         assert(step==agent.numSteps, 'trainer step: ' .. step ..
                 ' & agent.numSteps: ' .. agent.numSteps)
-        print("Steps: ", step, "\t", os.date("%x %X"))
+        print("Steps: ", step, "\t", os.date("%m/%d/%y %X"))
         agent:report()
         collectgarbage()
     end
@@ -153,7 +153,7 @@ while step < opt.steps do
     -- Evaluate the system each opt.eval_freq steps
     -- Create a new game and iterate opt.eval_steps
     if step % opt.eval_freq == 0 and step > learn_start then
-print("- Evaluating", "\t", os.date("%x %X"))
+print("- Evaluating", "\t", os.date("%m/%d/%y %X"))
         screen, reward, terminal = game_env:newGame()
 
         total_reward = 0
@@ -222,7 +222,7 @@ print("- Evaluating", "\t", os.date("%x %X"))
 
     -- Store the current network each opt.save_freq or when the training has ended
     if step % opt.save_freq == 0 or step == opt.steps then
-print("- Saving", "\t", os.date("%x %X"))
+print("- Saving", "\t", os.date("%m/%d/%y %X"))
 
         local filename = opt.name
 
@@ -236,7 +236,7 @@ print("- Saving", "\t", os.date("%x %X"))
 
             -- Save the comlete network and also only the convolutional part
             torch.save(opt.store_src .. filename .. "_" .. date ..'.model.t7', { model = agent.network, network = agent.network:get(2) })
-            print('Saved:', opt.store_src .. filename .. "_" .. date ..'.model.t7', "\t", os.date("%x %X"))
+            print('Saved:', opt.store_src .. filename .. "_" .. date ..'.model.t7', "\t", os.date("%m/%d/%y %X"))
         else
             local s, a, r, s2, term = agent.valid_s, agent.valid_a, agent.valid_r,
                 agent.valid_s2, agent.valid_term
@@ -269,7 +269,7 @@ print("- Saving", "\t", os.date("%x %X"))
                 agent.valid_term = s, a, r, s2, term
             agent.w, agent.dw, agent.g, agent.g2, agent.delta, agent.delta2,
                 agent.deltas, agent.tmp = w, dw, g, g2, delta, delta2, deltas, tmp
-            print('Saved:', filename .. '.t7', "\t", os.date("%x %X"))
+            print('Saved:', filename .. '.t7', "\t", os.date("%m/%d/%y %X"))
         end
 
         io.flush()
