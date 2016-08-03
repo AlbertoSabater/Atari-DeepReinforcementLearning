@@ -1,16 +1,23 @@
 # Atari-DeepReinforcementLearning
 
-This project contains the source code of DQN 3.0, a Lua-based deep reinforcement
+
+This repository contains the source code of my Final Degree Project in Computer Engineering, University of Zaragoza. For further information about this project, read the [project report](report.pdf) (spanish).
+
+
+##Introduction
+
+This code is baes on the code of DQN 3.0, a Lua-based deep reinforcement
 learning architecture, necessary to reproduce the experiments
 described in the paper "Human-level control through deep reinforcement
-learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.
+learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.<br />
 	https://sites.google.com/a/deepmind.com/dqn/
 
 This code has been modified to create a new DQN architecture with some of his 
 layers pretrained, given another neural network. Optionally, this preatrained
 layers can be frozen to avoid his modification during the training. This code 
 also allow the pretraining of a part of a layer, creating his complementary 
-layer with random weights.
+layer with random weights. The aim of this pretraining is to increase the 
+training performance and the result obtained.
 
 Other little modifications have been implemented, like the game screen 
 visualization, or the game frames storing.
@@ -21,7 +28,7 @@ Pretrained weight have been learned with:
   - Autoencoders: https://github.com/asabater94/Convolutional-Autoencoder-for-Feature-Extraction
   - Knowledge transfer: using a trained network with one game, to learn other game
 
-For further details, read the [project report](report.pdf).
+For further details, read the [project report](report.pdf) (spanish).
 
 ##DQN 3.0
 
