@@ -1,19 +1,31 @@
 # Atari-DeepReinforcementLearning
 
-Code from the paper 'Human-level control through deep reinforcement learning': https://sites.google.com/a/deepmind.com/dqn/
-
-
-
-
-##DQN 3.0
-
 This project contains the source code of DQN 3.0, a Lua-based deep reinforcement
 learning architecture, necessary to reproduce the experiments
 described in the paper "Human-level control through deep reinforcement
 learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.
+	https://sites.google.com/a/deepmind.com/dqn/
 
-To replicate the experiment results, a number of dependencies need to be
-installed, namely:
+This code has been modified to create a new DQN architecture with some of his 
+layers pretrained, given another neural network. Optionally, this preatrained
+layers can be frozen to avoid his modification during the training. This code 
+also allow the pretraining of a part of a layer, creating his complementary 
+layer with random weights.
+
+Other little modifications have been implemented, like the game screen 
+visualization, or the game frames storing.
+
+
+Pretrained weight have been learned with: 
+  - K-means clustering: https://github.com/asabater94/Kmeans-for-Convolutional-Feature-Extration
+  - Autoencoders: https://github.com/asabater94/Convolutional-Autoencoder-for-Feature-Extraction
+  - Knowledge transfer: using a trained network with one game, to learn other game
+
+For further details, read the [project report](report.pdf).
+
+##DQN 3.0
+
+A number of dependencies need to be installed, namely:
   * LuaJIT and Torch 7.0
   * nngraph
   * Xitari (fork of the Arcade Learning Environment (Bellemare et al., 2013))
