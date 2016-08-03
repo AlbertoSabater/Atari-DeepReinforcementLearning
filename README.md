@@ -29,7 +29,11 @@ Pretrained weight have been learned with:
   - Knowledge transfer: using a trained network with one game, to learn other game
 
 
- ![Architecture example](images/architecture_example.png)
+![Architecture example](images/architecture_example.png)
+[![Video example]](https://www.youtube.com/watch?v=_vTXlFMyc-Q)
+
+<a href="https://www.youtube.com/watch?v=_vTXlFMyc-Q" target="_blank"></a>
+
 
 
 For further details, read the [project report](report.pdf) (spanish).
