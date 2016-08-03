@@ -13,19 +13,19 @@ described in the paper "Human-level control through deep reinforcement
 learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.
 
 To replicate the experiment results, a number of dependencies need to be
-installed, namely:<br />
-  * LuaJIT and Torch 7.0<br />
-  * nngraph<br />
-  * Xitari (fork of the Arcade Learning Environment (Bellemare et al., 2013))<br />
-  * AleWrap (a lua interface to Xitari)<br />
+installed, namely:
+  * LuaJIT and Torch 7.0
+  * nngraph
+  * Xitari (fork of the Arcade Learning Environment (Bellemare et al., 2013))
+  * AleWrap (a lua interface to Xitari)
 An install script for these dependencies is provided.
 
 When all dependencies have been installed, you have to replace the code from 
 'torch/share/lua/5.1/alewrap' with the code given in this project.
 
-Two run scripts are provided:<br />
-  - run_gpu: trains the DQN network using GPUs according to the given parameters<br />
-  - test_tr: executes a performance test and show the game in the screen <br />
+Two run scripts are provided:
+  - run_gpu: trains the DQN network using GPUs according to the given parameters
+  - test_tr: executes a performance test and show the game in the screen
 
 
 
@@ -42,10 +42,10 @@ http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux
 
 
 To train DQN on Atari games, the following components must be installed:<br />
-  * LuaJIT and Torch 7.0<br />
-  * nngraph<br />
-  * Xitari<br />
-  * AleWrap<br />
+  * LuaJIT and Torch 7.0
+  * nngraph
+  * Xitari
+  * AleWrap
 
 To install all of the above in a subdirectory called 'torch', it should be enough to run
 
