@@ -91,7 +91,7 @@ path="../trained_networks/"$1"_log_"$md
 #path="/tmp/trained_networks/"$1"_log_"$md
 echo $path
 cd dqn
-if [ display ]; then 
+if [ display == 1 ]; then 
 	../torch/bin/qlua train_agent.lua $args 2>&1 | tee $path;
 else
 	../torch/bin/luajit train_agent.lua $args 2>&1 | tee $path;
