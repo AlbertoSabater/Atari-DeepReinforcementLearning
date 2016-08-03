@@ -10,7 +10,7 @@ This code is based on the code of DQN 3.0, a Lua-based deep reinforcement
 learning architecture, necessary to reproduce the experiments
 described in the paper "Human-level control through deep reinforcement
 learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.<br />
-  https://sites.google.com/a/deepmind.com/dqn/
+  - https://sites.google.com/a/deepmind.com/dqn/
 
 This code has been modified to create a new DQN architecture with some of his 
 layers pretrained, given another neural network. Optionally, this preatrained
