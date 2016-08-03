@@ -46,7 +46,8 @@ A number of dependencies need to be installed, namely:
 An install script for these dependencies is provided.
 
 When all dependencies have been installed, you have to replace the code from 
-'torch/share/lua/5.1/alewrap' with the code given in this project.
+'torch/share/lua/5.1/alewrap' with the code given in this project to enable 
+the screen visualization option.
 
 Two run scripts are provided:
   - run_gpu: trains the DQN network using GPUs according to the given parameters
