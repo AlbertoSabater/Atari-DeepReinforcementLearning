@@ -30,10 +30,7 @@ Pretrained weight have been learned with:
 
 
 ![Architecture example](images/architecture_example.png)
-[![Video example]](https://www.youtube.com/watch?v=_vTXlFMyc-Q)
-
-<a href="https://www.youtube.com/watch?v=_vTXlFMyc-Q" target="_blank"><img src="images/architecture_example.png" 
-alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+![Video example](images/video.gif)
 
 
 
