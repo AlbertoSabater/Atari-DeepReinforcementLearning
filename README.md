@@ -14,7 +14,7 @@ learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.<br 
 
 This code has been modified to create a new DQN architecture with some of his 
 layers pretrained, given another neural network. Optionally, this preatrained
-layers can be frozen to avoid his modification during the training. This code 
+layers can be frozen to avoid his modification during the main training. This code 
 also allow the pretraining of a part of a layer, creating his complementary 
 layer with random weights. The aim of this pretraining is to increase the 
 training performance and the result obtained.
