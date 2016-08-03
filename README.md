@@ -13,7 +13,7 @@ learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.<br 
   - https://sites.google.com/a/deepmind.com/dqn/
 
 This code has been modified to create a new DQN architecture with some of his 
-layers pretrained, given another neural network. Optionally, this preatrained
+layers pretrained, given another neural network. Optionally, these preatrained
 layers can be frozen to avoid his modification during the main training. This code 
 also allow the pretraining of a part of a layer, creating his complementary 
 layer with random weights. The aim of this pretraining is to increase the 
@@ -23,7 +23,7 @@ Other little modifications have been implemented, like the game screen
 visualization, or the game frames storing.
 
 
-Pretrained weight have been learned with: 
+Pretrained weights have been learned with: 
   - K-means clustering: https://github.com/asabater94/Kmeans-for-Convolutional-Feature-Extration
   - Autoencoders: https://github.com/asabater94/Convolutional-Autoencoder-for-Feature-Extraction
   - Knowledge transfer: using a trained network with one game, to learn other game
