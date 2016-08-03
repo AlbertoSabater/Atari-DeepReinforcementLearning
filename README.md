@@ -105,7 +105,11 @@ If GPU_ID is not specified, the first available GPU (ID 0) will be used by defau
 
 ##Options
 
-Options to DQN are set within run_cpu (respectively, run_gpu). You may,
-for example, want to change the frequency at which information is output 
-to stdout by setting 'prog_freq' to a different value.
-
+Options to DQN are set within run_gpu. Y
+  - Use '-lnk' to load a pretrained network
+    - freeze_kernels: to freeze the pretrained weights
+    - traines_kernels_net: path to the pretrained_network
+    - num_layers: number of the pretrained convolutional layers to load
+    - load_num_fc: number of the pretrained fully connected layers to load
+  - Use '-sf' to store the training frames
+  - display: to enable game screen
