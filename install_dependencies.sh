@@ -97,6 +97,7 @@ echo "nngraph installation completed"
 
 
 #Install qttorch to enable screen
+torch/bin/luarocks install qtlua
 torch/bin/luarocks install qttorch
 
 
