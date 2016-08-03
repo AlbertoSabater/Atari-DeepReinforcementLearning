@@ -29,7 +29,7 @@ Pretrained weight have been learned with:
   - Knowledge transfer: using a trained network with one game, to learn other game
 
 
-![Video example](images/video.gif)        
+![Video example](images/video.gif) 
 <img src="images/architecture_example.png" width="450">
 
 
