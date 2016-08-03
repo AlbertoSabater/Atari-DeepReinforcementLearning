@@ -14,10 +14,10 @@ learning", Nature 518, 529–533 (26 February 2015) doi:10.1038/nature14236.
 
 To replicate the experiment results, a number of dependencies need to be
 installed, namely:
-    * LuaJIT and Torch 7.0
-    * nngraph
-    * Xitari (fork of the Arcade Learning Environment (Bellemare et al., 2013))
-    * AleWrap (a lua interface to Xitari)
+	* LuaJIT and Torch 7.0
+	* nngraph
+	* Xitari (fork of the Arcade Learning Environment (Bellemare et al., 2013))
+	* AleWrap (a lua interface to Xitari)
 An install script for these dependencies is provided.
 
 When all dependencies have been installed, you have to replace the code from 
@@ -42,10 +42,10 @@ http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux
 
 
 To train DQN on Atari games, the following components must be installed:
-    * LuaJIT and Torch 7.0
-    * nngraph
-    * Xitari
-    * AleWrap
+	* LuaJIT and Torch 7.0
+	* nngraph
+	* Xitari
+	* AleWrap
 
 To install all of the above in a subdirectory called 'torch', it should be enough to run
 
@@ -64,10 +64,6 @@ libpng-dev, ncurses-dev, imagemagick, unzip
 
 Prior to running DQN on a game, you should copy its ROM in the 'roms' subdirectory.
 It should then be sufficient to run the script
-
-    ./run_cpu <game name>
-
-Or, if GPU support is enabled,
 
     ./run_gpu <game name>
 
