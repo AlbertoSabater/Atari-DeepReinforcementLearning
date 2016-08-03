@@ -105,10 +105,10 @@ If GPU_ID is not specified, the first available GPU (ID 0) will be used by defau
 
 ##Options
 
-Options to DQN are set within run_gpu. Y
+Options to DQN are set within run_gpu and test_tr. 
   - Use '-lnk' to load a pretrained network
     - freeze_kernels: to freeze the pretrained weights
-    - traines_kernels_net: path to the pretrained_network
+    - traines_kernels_net: path to the pretrained network
     - num_layers: number of the pretrained convolutional layers to load
     - load_num_fc: number of the pretrained fully connected layers to load
   - Use '-sf' to store the training frames
