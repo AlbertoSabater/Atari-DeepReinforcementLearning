@@ -4,7 +4,7 @@
 This repository contains the source code of my Final Degree Project in Computer Engineering, University of Zaragoza. For further information about this project, read the [project report](report.pdf) (spanish).
 
 
-##Introduction
+## Introduction
 
 This code is based on the code of DQN 3.0, a Lua-based deep reinforcement
 learning architecture, necessary to reproduce the experiments
@@ -36,7 +36,7 @@ Pretrained weights have been learned with:
 
 For further details, read the [project report](report.pdf) (spanish).
 
-##DQN 3.0
+## DQN 3.0
 
 A number of dependencies need to be installed, namely:
   * LuaJIT and Torch 7.0
@@ -86,7 +86,7 @@ libpng-dev, ncurses-dev, imagemagick, unzip
 
 
 
-##Training DQN on Atari games
+## Training DQN on Atari games
 
 Prior to running DQN on a game, you should copy its ROM in the 'roms' subdirectory.
 It should then be sufficient to run the script
@@ -103,7 +103,7 @@ If GPU_ID is not specified, the first available GPU (ID 0) will be used by defau
 
 
 
-##Options
+## Options
 
 Options to DQN are set within run_gpu and test_tr. 
   - Use '-lnk' to load a pretrained network
