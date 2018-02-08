@@ -55,7 +55,7 @@ Two run scripts are provided:
 
 
 
-##Installation instructions
+## Installation instructions
 
 The installation requires Linux with apt-get.
 
